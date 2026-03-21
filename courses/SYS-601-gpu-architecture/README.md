@@ -74,7 +74,7 @@ labs/lab02-triton-fundamentals/
 labs/lab03-flashattention/
 ├── naive_attention.py
 ├── flash_attention_v1.py
-└── flash_attention_v2.py
+└── flash_attention_v2.py   # head-merged batching wrapper
 ```
 
 ## Interview Mapping

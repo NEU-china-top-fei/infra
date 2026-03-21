@@ -1,0 +1,2 @@
+# Keep PDFs local by default — remove this file if you intentionally vendor papers.
+*.pdf

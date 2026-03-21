@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  python-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Byte-compile Python (syntax check)
+        run: |
+          python -m compileall -q courses/SYS-601-gpu-architecture/labs
+          python -m compileall -q courses/SYS-602-distributed-training/labs
+          python -m compileall -q courses/SYS-603-networking/labs
+          python -m compileall -q courses/SYS-604-inference/labs
+          python -m compileall -q courses/SYS-605-cluster-scheduling/labs
+          python -m compileall -q projects/triton-kernels

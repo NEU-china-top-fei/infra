@@ -71,10 +71,23 @@ interview-prep/
 - [ ] 海量数据并行文件系统 I/O 预估
 - [ ] MFU (Model FLOPS Utilization) 计算
 
-## Practice Resources
+## Practice resources
 
-Each round directory should contain:
-1. `questions.md` - Common interview questions
-2. `solutions/` - Your prepared answers and code
-3. `whiteboard/` - Diagrams and formulas for whiteboard sessions
-4. `mock-interviews/` - Self-assessment recordings
+Each round directory includes:
+
+- `questions.md` in each round folder — starter prompts (add your own)
+- `solutions/` — your writeups and code (use [`TEMPLATE.md`](TEMPLATE.md))
+- `whiteboard/` — exported diagrams or photos
+- *(Optional)* `mock-interviews/` — recordings or checklists (create locally if needed)
+
+### Round index
+
+| Round | Folder |
+|------:|--------|
+| 1 | [round-1-systems-coding](round-1-systems-coding/) |
+| 2 | [round-2-gpu-kernel](round-2-gpu-kernel/) |
+| 3 | [round-3-distributed-training](round-3-distributed-training/) |
+| 4 | [round-4-networking](round-4-networking/) |
+| 5 | [round-5-inference](round-5-inference/) |
+| 6 | [round-6-resilience](round-6-resilience/) |
+| 7 | [round-7-capstone](round-7-capstone/) |

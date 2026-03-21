@@ -1,0 +1,4 @@
+# Large or generated datasets stay untracked.
+*
+!.gitignore
+!README.md

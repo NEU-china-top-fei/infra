@@ -1,0 +1,3 @@
+# Optional consolidated deps for course labs (install subsets as needed).
+torch>=2.2.0
+triton>=3.0.0

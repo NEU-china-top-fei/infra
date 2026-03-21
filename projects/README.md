@@ -1,13 +1,22 @@
 # Projects
 
-This directory contains hands-on projects to build your AI Infrastructure portfolio.
+Hands-on work to build an **AI infrastructure portfolio** (reports + reproducible code + profiling artifacts).
 
-## Project Portfolio Structure
+| Directory | README |
+|-----------|--------|
+| `triton-kernels/` | [README](triton-kernels/README.md) — runnable softmax starter |
+| `megatron-experiments/` | [README](megatron-experiments/README.md) |
+| `nccl-analysis/` | [README](nccl-analysis/README.md) |
+| `vllm-exploration/` | [README](vllm-exploration/README.md) |
+| `cluster-simulation/` | [README](cluster-simulation/README.md) |
+
+## Suggested project ideas
 
 ### 1. Triton Kernels (`triton-kernels/`)
+
 Custom GPU kernels written in Triton for operator optimization.
 
-**Suggested Projects:**
+**Suggested follow-ons:**
 - [ ] Fused LayerNorm kernel
 - [ ] FlashAttention simplified implementation
 - [ ] Custom activation functions (SiLU, GELU)

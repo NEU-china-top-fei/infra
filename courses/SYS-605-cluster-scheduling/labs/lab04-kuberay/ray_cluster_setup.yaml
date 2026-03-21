@@ -1,0 +1,34 @@
+# Illustrative RayCluster CRD — consult current KubeRay docs for your version
+apiVersion: ray.io/v1
+kind: RayCluster
+metadata:
+  name: ray-mini
+spec:
+  headGroupSpec:
+    serviceType: ClusterIP
+    rayStartParams:
+      dashboard-host: "0.0.0.0"
+    template:
+      spec:
+        containers:
+          - name: ray-head
+            image: rayproject/ray:2.9.3-py310
+            resources:
+              limits:
+                cpu: "2"
+                memory: 4Gi
+  workerGroupSpecs:
+    - groupName: small
+      replicas: 1
+      minReplicas: 1
+      maxReplicas: 1
+      rayStartParams: {}
+      template:
+        spec:
+          containers:
+            - name: ray-worker
+              image: rayproject/ray:2.9.3-py310
+              resources:
+                limits:
+                  cpu: "2"
+                  memory: 4Gi

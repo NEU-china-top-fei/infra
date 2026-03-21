@@ -1,0 +1,3 @@
+# Pin loosely for a tutorial repo; tighten for reproducible benchmarks.
+torch>=2.2.0
+triton>=3.0.0

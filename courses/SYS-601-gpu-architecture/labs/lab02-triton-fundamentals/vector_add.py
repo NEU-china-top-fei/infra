@@ -34,13 +34,36 @@ def triton_add(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     return out
 
 
+# self implementation
+@triton.jit
+def SelfKernel(
+    x: torch.Tensor, y: torch.Tensor, out: torch.Tensor, BLOCKSIZE: tl.constexpr
+):
+    thisId = tl.program_id(0)
+    off = thisId * BLOCKSIZE + tl.arange(0, BLOCKSIZE)
+    xptrs = tl.load(x + off)
+    yptrs = tl.load(y + off)
+    output = xptrs + yptrs
+    tl.store(out + off, output)
+
+
+def SelfTritonAdd(x: torch.Tensor, y: torch.Tensor):
+    output = torch.empty_like(x)
+    n = x.numel()
+    BLOCKSIZE = 16
+    NUMBLOCK = (BLOCKSIZE + n - 1) // BLOCKSIZE
+    SelfKernel[(NUMBLOCK,)](x, y, output, BLOCKSIZE)
+    return output
+
+
 def main() -> None:
     torch.manual_seed(0)
     n = 1_000_003
     x = torch.randn(n, device="cuda")
     y = torch.randn(n, device="cuda")
     ref = x + y
-    got = triton_add(x, y)
+    # got = triton_add(x, y)
+    got = SelfTritonAdd(x, y)
     assert torch.allclose(ref, got)
     print("triton_add ok, max_err=", (ref - got).abs().max().item())
 

@@ -42,8 +42,31 @@ def triton_softmax(x: torch.Tensor) -> torch.Tensor:
     rows, cols = x.shape
     out = torch.empty_like(x)
     BLOCK = _next_pow2(cols)
-    assert BLOCK <= 8192, "increase BLOCK cap or tile rows differently for wide matrices"
+    assert (
+        BLOCK <= 8192
+    ), "increase BLOCK cap or tile rows differently for wide matrices"
     _softmax_kernel[(rows,)](x, out, x.stride(0), cols, BLOCK_SIZE=BLOCK)
+    return out
+
+
+@triton.jit
+def SelfKernel(x: torch.Tensor, out: torch.Tensor, BLOCkSIZE: tl.constexpr, n):
+    rownum = tl.program_id(0)
+    Tmask = tl.arange(0, BLOCkSIZE) < n
+    idxs = tl.arange(0, BLOCkSIZE) + rownum * n
+    xptrs = tl.load(x + idxs, mask=Tmask, other=float("-inf"))  #!!!注意填充
+    maxele = tl.max(xptrs)
+    minused = tl.exp(xptrs - maxele)
+    output = minused / tl.sum(minused)
+    tl.store(out + idxs, output, mask=Tmask)
+
+
+def SelfSoftMax(x: torch.Tensor):
+    n = x.shape[-1]
+    m = 1 if len(x.shape) == 1 else x.shape[0]
+    BLOCK_SIZE = _next_pow2(n)
+    out = torch.empty_like(x)
+    SelfKernel[(m,)](x, out, BLOCK_SIZE, n)
     return out
 
 
@@ -51,8 +74,11 @@ def main() -> None:
     torch.manual_seed(0)
     x = torch.randn(128, 768, device="cuda")
     ref = torch.softmax(x, dim=-1)
-    got = triton_softmax(x)
+    # got = triton_softmax(x)
+    got = SelfSoftMax(x)
     assert torch.allclose(ref, got, atol=1e-5, rtol=1e-5)
+    # print(ref)
+    # print(got)
     print("triton_softmax ok, max_err=", (ref - got).abs().max().item())
 
 

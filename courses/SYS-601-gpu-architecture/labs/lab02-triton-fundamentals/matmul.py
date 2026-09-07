@@ -75,14 +75,77 @@ def triton_matmul(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
     return c
 
 
+@triton.jit
+def SelfKernel(
+    x: torch.Tensor,
+    y: torch.Tensor,
+    m,
+    n,
+    k,
+    output: torch.Tensor,
+    stride: tl.constexpr,
+):
+    # 这个函数里面已经退化成pointer了
+    mblockidx = tl.program_id(0)
+    nblockidx = tl.program_id(1)
+    kstride = 16
+    xrowstart = mblockidx * stride
+    ycolstart = nblockidx * stride
+    out = tl.zeros(
+        (stride, stride), dtype=tl.float32
+    )  # triton中别用torch,要求stride为固定常量
+    # acc的时候使用32,乘法半精度
+    rangem = tl.arange(0, stride)  # 要求constexpr
+    rangen = tl.arange(0, stride)
+    rangek = tl.arange(0, 16)
+    for i in range(0, k, kstride):
+        aidxs = (xrowstart + rangem)[:, None] * k + (i + rangek)[None, :]
+
+        bidxs = (ycolstart + rangen)[None, :] + (i + rangek)[:, None] * n
+
+        aptrs = tl.load(
+            x + aidxs,
+            ((xrowstart + rangem)[:, None] < m) & ((i + rangek)[None, :] < k),
+            other=0,  # 记得括号,&来表示
+        )
+        bptrs = tl.load(
+            y + bidxs,
+            ((ycolstart + rangen)[None, :] < n) & ((i + rangek)[:, None] < k),
+            other=0,
+        )
+
+        out += tl.dot(aptrs, bptrs)
+
+    cidxs = (xrowstart + rangem)[:, None] * n + (ycolstart + rangen)[None, :]
+    tl.store(
+        output + cidxs,
+        out,
+        mask=((xrowstart + rangem)[:, None] < m) & ((ycolstart + rangen)[None, :] < n),
+    )
+
+
+def SelfMatMul(x: torch.Tensor, y: torch.Tensor):
+    strideMN = 8
+    m, k = x.shape
+    _, n = y.shape
+    NumMBlock = (m + strideMN - 1) // strideMN
+    NumNBlock = (n + strideMN - 1) // strideMN
+    output = torch.zeros((m, n), device="cuda", dtype=torch.float16)
+    SelfKernel[(NumMBlock, NumNBlock)](x, y, m, n, k, output, strideMN)
+    return output
+
+
 def main() -> None:
     torch.manual_seed(0)
     a = torch.randn(512, 256, device="cuda", dtype=torch.float16)
     b = torch.randn(256, 768, device="cuda", dtype=torch.float16)
     ref = a @ b
     got = triton_matmul(a, b)
-    assert torch.allclose(ref, got.float(), atol=0.1, rtol=0.01)
-    print("triton_matmul ok (fp16 tolerance), max_err=", (ref - got.float()).abs().max().item())
+    assert torch.allclose(ref.float(), got.float(), atol=0.1, rtol=0.01)
+    print(
+        "triton_matmul ok (fp16 tolerance), max_err=",
+        (ref - got.float()).abs().max().item(),
+    )
 
 
 if __name__ == "__main__":

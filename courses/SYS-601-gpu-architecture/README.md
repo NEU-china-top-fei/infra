@@ -44,8 +44,8 @@
 ### Engineering Blogs & Tutorials
 - [ ] [OpenAI Triton 1.0 Release Blog](https://openai.com/index/triton/)
 - [✓] [Introduction to GPU Programming with Triton](https://medium.com/@katherineolowookere/introduction-to-gpu-programming-with-triton-d7412289bd51)
-- [ ] [How I Wrote FlashAttention-2 from Scratch in Custom Triton Kernels](https://medium.com/@katherineolowookere/how-i-wrote-flashattention-2-from-scratch-in-custom-triton-kernels-885cac1da357)
-- [ ] [Triton Kernel Compilation Stages](https://pytorch.org/blog/triton-kernel-compilation-stages/)
+- [✓] [How I Wrote FlashAttention-2 from Scratch in Custom Triton Kernels](https://medium.com/@katherineolowookere/how-i-wrote-flashattention-2-from-scratch-in-custom-triton-kernels-885cac1da357)
+- [✓] [Triton Kernel Compilation Stages](https://pytorch.org/blog/triton-kernel-compilation-stages/)
 - [ ] [Building High-Performance AI/ML Pipelines with C++ and CUDA](https://www.wholetomato.com/blog/building-high-performance-ai-ml-pipelines-with-c-and-cuda/)
 - [ ] [Understanding Flash Attention: Writing the algorithm from scratch in Triton](https://alexdremov.me/understanding-flash-attention-writing-the-algorithm-from-scratch-in-triton/)
 - [ ] [Fear and Loathing in Lock-Free Programming](https://medium.com/@tylerneely/fear-and-loathing-in-lock-free-programming-7158b1cdd50c)
